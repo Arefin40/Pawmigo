@@ -14,7 +14,7 @@ const Activities: React.FC<ActivitiesProps> = ({ size, className, filled, ...pro
          width={size}
          height={size}
          {...props}
-         className={cn("relative size-4 flex-shrink-0 fill-current stroke-current", className)}
+         className={cn("relative w-4 h-4 flex-shrink-0 fill-current stroke-current", className)}
       >
          {filled ? (
             <>

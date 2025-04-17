@@ -14,7 +14,7 @@ const Home: React.FC<HomeProps> = ({ size, className, filled, ...props }) => {
          width={size}
          height={size}
          {...props}
-         className={cn("relative size-4 flex-shrink-0 fill-current stroke-current", className)}
+         className={cn("relative w-4 h-4 flex-shrink-0 fill-current stroke-current", className)}
       >
          {filled ? (
             <Path d="M22.175 6.694 15.712 1.35a5.777 5.777 0 0 0-7.424 0L1.825 6.694C.661 7.657 0 9.116 0 10.639v8.334C0 21.68 2.08 24 4.8 24h2.4a2.4 2.4 0 0 0 2.4-2.4v-3.902c0-1.522 1.142-2.628 2.4-2.628s2.4 1.106 2.4 2.628V21.6a2.4 2.4 0 0 0 2.4 2.4h2.4c2.72 0 4.8-2.32 4.8-5.028v-8.333c0-1.523-.66-2.982-1.825-3.945z" />
