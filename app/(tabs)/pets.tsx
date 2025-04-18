@@ -39,7 +39,7 @@ export default function MyPetsScreen() {
 
    return (
       <View className="flex flex-1 p-4">
-         <Text className="font-strong text-2xl font-bold text-white mb-6">My Pets</Text>
+         <Text className="font-strong text-2xl text-white mb-6">My Pets</Text>
 
          {pets.length === 0 ? (
             <View className="flex-1 items-center justify-center">

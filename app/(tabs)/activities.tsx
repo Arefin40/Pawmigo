@@ -90,7 +90,7 @@ export default function ActivitiesScreen() {
 
    return (
       <View className="flex flex-1 p-4">
-         <Text className="font-strong text-2xl font-bold text-white mb-6">Activity Log</Text>
+         <Text className="font-strong text-2xl text-white mb-6">Activity Log</Text>
 
          <View className="flex-row gap-2 mb-4">
             {filters.map(({ label, value }) => (

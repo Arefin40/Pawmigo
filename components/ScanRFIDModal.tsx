@@ -7,82 +7,69 @@ import {
    DialogHeader,
    DialogTitle
 } from "@/components/ui/dialog";
-import NfcManager, { NfcTech } from "react-native-nfc-manager";
+import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 import RFID from "@/icons/RFID";
-import { Link } from "expo-router";
-import { Button } from "./ui/button";
-import { Text } from "./ui/text";
 import { View } from "react-native";
+import NfcManager, { NfcTech } from "react-native-nfc-manager";
+import { Link, router } from "expo-router";
 
 interface ScanRFIDModalProps {
    open: boolean;
    onOpenChange: (value: boolean) => void;
 }
 
-interface NFCState {
-   isSupported: boolean;
-   isEnabled: boolean;
-   isLoading: boolean;
-   isScanning: boolean;
-}
-
 // Initialize NFCManager
 NfcManager.start();
 
 const ScanRFIDModal: React.FC<ScanRFIDModalProps> = ({ open = false, onOpenChange }) => {
-   const [tag, setTag] = React.useState<string | null>(null);
    const [error, setError] = React.useState<string | null>(null);
-   const [nfcState, setNfcState] = React.useState<NFCState>({
-      isSupported: false,
-      isEnabled: false,
-      isLoading: false,
-      isScanning: false
-   });
+   const [isScanning, setIsScanning] = React.useState<boolean>(false);
+
+   const handleNFCError = (err: unknown) => {
+      setError(err instanceof Error ? err.message : "Failed to load NFC module");
+   };
+
+   const validateNFC = async () => {
+      if (!NfcManager) throw new Error("NFCManager is not imported");
+
+      const isSupported = await NfcManager.isSupported();
+      if (!isSupported) throw new Error("NFC is not supported");
+
+      const isEnabled = await NfcManager.isEnabled();
+      if (!isEnabled) throw new Error("NFC is not enabled");
+   };
 
    const checkNFC = React.useCallback(async () => {
       try {
-         setNfcState((prev) => ({ ...prev, isLoading: true }));
-
-         if (!NfcManager) {
-            throw new Error("NFCManager is not imported");
-         }
-
-         const isSupported = await NfcManager.isSupported();
-         if (!isSupported) {
-            throw new Error("NFC is not supported");
-         }
-
-         const isEnabled = await NfcManager.isEnabled();
-         if (!isEnabled) {
-            throw new Error("NFC is not enabled");
-         }
-
-         setNfcState((prev) => ({
-            ...prev,
-            isSupported,
-            isEnabled,
-            isLoading: false
-         }));
+         await validateNFC();
       } catch (err) {
-         setError(err instanceof Error ? err.message : "Failed to load NFC module");
-         setNfcState((prev) => ({ ...prev, isLoading: false }));
+         handleNFCError(err);
       }
    }, []);
+
+   const handleTagFound = (tag: { id?: string }) => {
+      if (tag?.id) {
+         onOpenChange(false);
+         router.push({ pathname: "/new-pet", params: { rfid: tag.id } });
+      }
+   };
 
    const readNFC = React.useCallback(async () => {
       try {
+         await NfcManager.cancelTechnologyRequest();
          await NfcManager.requestTechnology(NfcTech.Ndef);
-         setNfcState((prev) => ({ ...prev, isScanning: true }));
+         setIsScanning(true);
 
          const tag = await NfcManager.getTag();
-         setTag(tag?.id ?? null);
+         if (tag) handleTagFound(tag);
       } catch (err) {
          setError(err instanceof Error ? err.message : "Failed to read NFC tag");
       } finally {
+         setIsScanning(false);
          await NfcManager.cancelTechnologyRequest();
-         setNfcState((prev) => ({ ...prev, isScanning: false }));
       }
-   }, []);
+   }, [onOpenChange]);
 
    React.useEffect(() => {
       checkNFC();
@@ -92,12 +79,10 @@ const ScanRFIDModal: React.FC<ScanRFIDModalProps> = ({ open = false, onOpenChang
    }, [checkNFC]);
 
    React.useEffect(() => {
-      if (open && nfcState.isEnabled && !nfcState.isScanning) {
+      if (open && !isScanning) {
          readNFC();
       }
-   }, [open, nfcState.isEnabled, nfcState.isScanning, readNFC]);
-
-   console.log(nfcState);
+   }, [open, isScanning, readNFC]);
 
    return (
       <Dialog open={open} onOpenChange={onOpenChange} className="!w-full !max-w-none">
@@ -105,10 +90,12 @@ const ScanRFIDModal: React.FC<ScanRFIDModalProps> = ({ open = false, onOpenChang
             <RFID />
             <DialogHeader className="gap-y-3">
                <DialogTitle className="text-center native:text-2xl">
-                  {nfcState.isScanning ? "Scanning..." : "Tap to Scan"}
+                  {isScanning ? "Scanning..." : "Tap to Scan"}
                </DialogTitle>
                <DialogDescription className="text-center native:text-xl">
-                  Hold your phone near your pet's RFID tag to scan.
+                  {error && typeof error === "string"
+                     ? error
+                     : "Hold your phone near your pet's RFID tag to scanning."}
                </DialogDescription>
 
                <View className="relative border-b border-border w-full my-8">
