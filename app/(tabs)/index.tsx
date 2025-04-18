@@ -49,14 +49,9 @@ export default function HomeScreen() {
          </BlurView>
 
          {/* Manual Feed Button */}
-         <BlurView
-            intensity={10}
-            className="mt-6 rounded-lg flex items-center justify-center flex-row"
-         >
-            <Button className="bg-primary/90 w-full py-4">
-               <Text className="text-white font-em">Manual Feed</Text>
-            </Button>
-         </BlurView>
+         <View className="mt-6 py-3 bg-white/5 rounded-lg flex items-center justify-center">
+            <Text className="text-white font-em">Manual Feed</Text>
+         </View>
 
          {/* Pet at Feeder Alert */}
          <BlurView

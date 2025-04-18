@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react-native";
 import ScanRFIDModal from "@/components/ScanRFIDModal";
 import { iconWithClassName } from "@/lib/icons";
+import { axios, isAxiosError } from "@/hooks/axios";
 
 iconWithClassName(Plus);
 
@@ -23,11 +24,14 @@ export default function MyPetsScreen() {
    React.useEffect(() => {
       const fetchPets = async () => {
          try {
-            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/pets`);
-            const data = await response.json();
+            const { data } = await axios.get("/pets");
             setPets(data.pets);
          } catch (error) {
-            console.error("Error fetching pets:", error);
+            if (isAxiosError(error)) {
+               console.error("Failed to fetch pets:", error.response?.data || error.message);
+            } else {
+               console.error("An unexpected error occurred:", error);
+            }
          }
       };
       fetchPets();

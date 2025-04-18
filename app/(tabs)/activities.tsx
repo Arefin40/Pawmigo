@@ -4,6 +4,7 @@ import { iconWithClassName } from "@/lib/icons";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import { Clock, Zap, Wifi, WifiOff, AlertTriangle, Rss, Cat } from "lucide-react-native";
 import type { Activity, ActivityItemProps, FilterButtonProps } from "@/types/activities";
+import { axios, isAxiosError } from "@/hooks/axios";
 
 iconWithClassName(Clock);
 iconWithClassName(Zap);
@@ -45,11 +46,19 @@ export default function ActivitiesScreen() {
    const [activities, setActivities] = React.useState<Activity[]>([]);
 
    React.useEffect(() => {
-      fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/activities`)
-         .then((res) => res.json())
-         .then((data) => {
+      const fetchActivities = async () => {
+         try {
+            const { data } = await axios.get("/activities");
             setActivities(data.activities);
-         });
+         } catch (error) {
+            if (isAxiosError(error)) {
+               console.error("Failed to fetch activities:", error.response?.data || error.message);
+            } else {
+               console.error("An unexpected error occurred:", error);
+            }
+         }
+      };
+      fetchActivities();
    }, []);
 
    const filteredActivities = activities.filter((activity) => {

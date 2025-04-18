@@ -108,20 +108,20 @@ const ScanRFIDModal: React.FC<ScanRFIDModalProps> = ({ open = false, onOpenChang
                   {nfcState.isScanning ? "Scanning..." : "Tap to Scan"}
                </DialogTitle>
                <DialogDescription className="text-center native:text-xl">
-                  {error || "Hold your phone near your pet's RFID tag to scan."}
+                  Hold your phone near your pet's RFID tag to scan.
                </DialogDescription>
 
-               <View className="relative border-b border-border w-full my-4">
-                  <Text className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 px-2 bg-white text-muted-foreground">
+               <View className="relative border-b border-border w-full my-8">
+                  <Text className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 px-2 bg-white text-muted-foreground font-strong">
                      OR
                   </Text>
                </View>
 
-               <DialogFooter>
+               <DialogFooter className="flex flex-row justify-center">
                   <Link href="/new-pet" asChild>
                      <Button
                         onPress={() => onOpenChange(false)}
-                        className="bg-sky-100 py-4 px-8 rounded-full"
+                        className="bg-sky-100 py-6 px-24 rounded-full"
                      >
                         <Text className="font-strong text-sky-600 text-base text-center uppercase">
                            Add Manually

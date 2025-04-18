@@ -14,38 +14,38 @@ module.exports = {
             logo: "Sora_700Bold"
          },
          colors: {
-            border: "hsl(var(--border))",
-            input: "hsl(var(--input))",
-            ring: "hsl(var(--ring))",
-            background: "hsl(var(--background))",
-            foreground: "hsl(var(--foreground))",
+            border: "#e4e4e7",
+            input: "#e4e4e7",
+            ring: "#145f3e",
+            background: "#ffffff",
+            foreground: "#09090b",
             primary: {
-               DEFAULT: "hsl(var(--primary))",
-               foreground: "hsl(var(--primary-foreground))"
+               DEFAULT: "#145f3e",
+               foreground: "#fafafa"
             },
             secondary: {
-               DEFAULT: "hsl(var(--secondary))",
-               foreground: "hsl(var(--secondary-foreground))"
+               DEFAULT: "#d8fdd2",
+               foreground: "#145f3e"
             },
             destructive: {
-               DEFAULT: "hsl(var(--destructive))",
-               foreground: "hsl(var(--destructive-foreground))"
+               DEFAULT: "#ef4444",
+               foreground: "#fafafa"
             },
             muted: {
-               DEFAULT: "hsl(var(--muted))",
-               foreground: "hsl(var(--muted-foreground))"
+               DEFAULT: "#f4f4f5",
+               foreground: "#8d9187"
             },
             accent: {
-               DEFAULT: "hsl(var(--accent))",
-               foreground: "hsl(var(--accent-foreground))"
+               DEFAULT: "#f4f4f5",
+               foreground: "#145f3e"
             },
             popover: {
-               DEFAULT: "hsl(var(--popover))",
-               foreground: "hsl(var(--popover-foreground))"
+               DEFAULT: "#ffffff",
+               foreground: "#09090b"
             },
             card: {
-               DEFAULT: "hsl(var(--card))",
-               foreground: "hsl(var(--card-foreground))"
+               DEFAULT: "#ffffff",
+               foreground: "#09090b"
             }
          },
          borderWidth: {
