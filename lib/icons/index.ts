@@ -1,0 +1,1 @@
+export { iconWithClassName } from "./iconWithClassName";

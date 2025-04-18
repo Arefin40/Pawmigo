@@ -29,20 +29,22 @@ export default function RootLayout() {
       <>
          <View className="flex-1 relative bg-transparent">
             <StatusBar style="light" backgroundColor="rgba(255, 255, 255, 0.05)" />
-            <SafeAreaView className="relative flex flex-1 z-50 bg-transparent">
+            <SafeAreaView className="relative flex flex-1 bg-transparent">
                <Header />
 
                <Stack
                   screenOptions={{
                      headerShown: false,
-                     contentStyle: { backgroundColor: "transparent" }
+                     contentStyle: { backgroundColor: "transparent" },
+                     animation: "slide_from_right"
                   }}
                >
                   <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="new-pet" />
                </Stack>
             </SafeAreaView>
 
-            <Image blurRadius={70} source={background} className="absolute w-full h-full" />
+            <Image blurRadius={70} source={background} className="absolute w-full h-full -z-50" />
          </View>
          <PortalHost />
       </>
