@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { Home, Activities, Pets } from "@/icons";
+import { Home, Activities, Pets, Menu } from "@/icons";
 import TabBar from "@/components/TabBar";
 
 const TabLayout = () => {
@@ -33,6 +33,13 @@ const TabLayout = () => {
             options={{
                title: "Pets",
                tabBarIcon: (props) => <Pets {...props} filled={props.focused} fill={props.color} />
+            }}
+         />
+         <Tabs.Screen
+            name="settings"
+            options={{
+               title: "Settings",
+               tabBarIcon: (props) => <Menu {...props} filled={props.focused} fill={props.color} />
             }}
          />
       </Tabs>

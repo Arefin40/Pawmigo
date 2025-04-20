@@ -32,7 +32,7 @@ const buttonVariants = cva(
 );
 
 const buttonTextVariants = cva(
-   "web:whitespace-nowrap text-sm native:text-base font-medium text-foreground web:transition-colors",
+   "web:whitespace-nowrap text-base native:text-base font-em text-foreground web:transition-colors",
    {
       variants: {
          variant: {
@@ -72,7 +72,7 @@ const Button = React.forwardRef<React.ElementRef<typeof Pressable>, ButtonProps>
             <Pressable
                className={cn(
                   props.disabled &&
-                     "opacity-50 text-base native:text-base web:pointer-events-none rounded-lg font-em",
+                     "opacity-50 text-base native:text-base web:pointer-events-none rounded-lg",
                   buttonVariants({ variant, size, className })
                )}
                ref={ref}
