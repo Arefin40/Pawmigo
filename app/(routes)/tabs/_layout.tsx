@@ -13,7 +13,7 @@ const TabLayout = () => {
          tabBar={(props) => <TabBar {...props} />}
       >
          <Tabs.Screen
-            name="index"
+            name="home"
             options={{
                title: "Home",
                tabBarIcon: (props) => <Home {...props} filled={props.focused} fill={props.color} />
