@@ -1,0 +1,61 @@
+{
+   "expo": {
+      "name": "pawmigo",
+      "slug": "pawmigo",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "icon": "./assets/images/icon.png",
+      "scheme": "pawmigo",
+      "userInterfaceStyle": "automatic",
+      "newArchEnabled": true,
+      "splash": {
+         "image": "./assets/images/splash.png",
+         "resizeMode": "contain",
+         "backgroundColor": "#ffffff"
+      },
+      "assetBundlePatterns": ["**/*"],
+      "ios": {
+         "supportsTablet": true
+      },
+      "android": {
+         "adaptiveIcon": {
+            "foregroundImage": "./assets/images/adaptive-icon.png",
+            "backgroundColor": "#ffffff"
+         },
+         "permissions": [
+            "android.permission.RECORD_AUDIO",
+            "android.permission.NFC",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.NFC",
+            "android.permission.INTERNET",
+            "android.permission.ACCESS_NETWORK_STATE"
+         ]
+      },
+      "web": {
+         "bundler": "metro",
+         "output": "static",
+         "favicon": "./assets/images/favicon.png"
+      },
+      "plugins": [
+         "expo-router",
+         [
+            "expo-image-picker",
+            {
+               "photosPermission": "The app needs access to your photos to add pictures of your pets."
+            }
+         ],
+         [
+            "react-native-nfc-manager",
+            {
+               "nfcPermission": "The app needs access to NFC to scan your pet's RFID tag",
+               "selectIdentifiers": ["*"],
+               "systemCodes": ["*"],
+               "includeNdefEntitlement": true
+            }
+         ]
+      ],
+      "experiments": {
+         "typedRoutes": true
+      }
+   }
+}
