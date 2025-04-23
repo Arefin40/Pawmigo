@@ -35,6 +35,20 @@ export const getDeviceById = query({
    }
 });
 
+// Get a device by deviceId
+export const getDeviceByDeviceId = query({
+   args: {
+      deviceId: v.string()
+   },
+   handler: async (ctx, args) => {
+      const device = await ctx.db
+         .query("devices")
+         .filter((q) => q.eq(q.field("deviceId"), args.deviceId))
+         .first();
+      return device;
+   }
+});
+
 // Register a device
 export const registerDevice = mutation({
    args: {

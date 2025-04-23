@@ -13,8 +13,9 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as device from "../device.js";
+import type * as devices from "../devices.js";
 import type * as pets from "../pets.js";
+import type * as schedules from "../schedules.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -25,8 +26,9 @@ import type * as pets from "../pets.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  device: typeof device;
+  devices: typeof devices;
   pets: typeof pets;
+  schedules: typeof schedules;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
