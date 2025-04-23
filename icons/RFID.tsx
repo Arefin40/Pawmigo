@@ -38,10 +38,13 @@ export default function RFID() {
 
    return (
       <View className="flex flex-col items-center justify-center">
-         <View className="relative mb-6">
+         <View className="relative">
             <Animated.View style={[pulseAnimation]} className="absolute inset-0 rounded-full" />
 
-            <View className="relative w-24 h-24 rounded-full flex items-center justify-center bg-gray-100">
+            <View
+               style={{ width: 96, height: 96 }}
+               className="relative w-24 h-24 rounded-full flex items-center justify-center bg-gray-100"
+            >
                <Svg viewBox="0 0 24 24" width={40} height={40}>
                   <Path
                      fill="#55abff"

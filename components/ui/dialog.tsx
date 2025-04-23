@@ -2,8 +2,10 @@ import React from "react";
 import * as DialogPrimitive from "@rn-primitives/dialog";
 import { Platform, StyleSheet, View, type ViewProps } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
-import { X } from "@/lib/icons/X";
+import { iconWithClassName } from "@/lib/utils";
+import { X } from "lucide-react-native";
 import { cn } from "@/lib/utils";
+iconWithClassName(X);
 
 const Dialog = DialogPrimitive.Root;
 
@@ -75,7 +77,7 @@ const DialogContent = React.forwardRef<
             <DialogPrimitive.Content
                ref={ref}
                className={cn(
-                  "max-w-lg gap-4 border border-border web:cursor-default bg-background p-6 shadow-lg web:duration-200 rounded-lg",
+                  "min-w-[24rem] max-w-lg gap-4 border border-border web:cursor-default bg-background p-6 shadow-lg web:duration-200 rounded-lg",
                   open
                      ? "web:animate-in web:fade-in-0 web:zoom-in-95"
                      : "web:animate-out web:fade-out-0 web:zoom-out-95",

@@ -20,3 +20,19 @@ export function iconWithClassName(icon: LucideIcon) {
       }
    });
 }
+
+// Upload image to Cloudinary
+export const uploadToCloudinary = async (base64Img: string) => {
+   const data = new FormData();
+   data.append("file", `data:image/jpeg;base64,${base64Img}`);
+   data.append("upload_preset", "pawmigo");
+
+   const res = await fetch(process.env.EXPO_PUBLIC_CLOUDINARY_API!, {
+      method: "POST",
+      body: data
+   });
+
+   const result = await res.json();
+   return result.secure_url as string;
+};
+
