@@ -18,6 +18,28 @@ export default defineSchema({
       rfid: v.string()
    }).index("by_rfid", ["rfid"]),
 
+   // Schedule table
+   schedule: defineTable({
+      petId: v.id("pets"),
+      name: v.optional(v.string()),
+      timestamp: v.string(),
+      days_of_week: v.array(
+         v.union(
+            v.literal("SAT"),
+            v.literal("SUN"),
+            v.literal("MON"),
+            v.literal("TUE"),
+            v.literal("WED"),
+            v.literal("THU"),
+            v.literal("FRI")
+         )
+      ),
+      portion: v.number(),
+      enabled: v.boolean()
+   })
+      .index("by_pet_id", ["petId"])
+      .index("by_enabled", ["enabled"]),
+
    // Activities table
    activities: defineTable({
       activityType: v.union(

@@ -36,3 +36,28 @@ export const uploadToCloudinary = async (base64Img: string) => {
    return result.secure_url as string;
 };
 
+// Format time to 12 hour
+export const formatTo12Hour = (timestamp: string) => {
+   const [hourStr, minuteStr] = timestamp.split(":");
+   let hour = parseInt(hourStr, 10);
+   const minute = minuteStr;
+   const period = hour >= 12 ? "PM" : "AM";
+
+   hour = hour % 12 || 12;
+
+   return `${hour}:${minute} ${period}`;
+};
+
+// Format time to 24 hour
+export const formatTo24Hour = (timestamp: string) => {
+   const [time, modifier] = timestamp.trim().split(" ");
+   let [hour, minute] = time.split(":").map(Number);
+
+   if (modifier.toUpperCase() === "PM" && hour !== 12) hour += 12;
+   if (modifier.toUpperCase() === "AM" && hour === 12) hour = 0;
+
+   const hourStr = String(hour).padStart(2, "0");
+   const minuteStr = String(minute).padStart(2, "0");
+
+   return `${hourStr}:${minuteStr}:00`;
+};
