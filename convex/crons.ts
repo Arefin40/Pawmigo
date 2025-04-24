@@ -6,8 +6,8 @@ const crons = cronJobs();
 crons.daily(
    "Schedule Daily Feedings",
    {
-      hourUTC: 16,
-      minuteUTC: 30
+      hourUTC: 18,
+      minuteUTC: 0
    },
    api.queue.scheduleDailyFeedings,
    {}

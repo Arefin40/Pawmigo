@@ -114,16 +114,20 @@ export const clear = mutation({
    }
 });
 
-// Convert HH:MM:SS to timestamp in milliseconds
+// Convert HH:MM:SS in GMT+6 to timestamp in milliseconds
 export const convertToTimestamp = (time: string) => {
    const [hours, minutes, seconds] = time.split(":");
    const now = new Date();
-   return new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
+   // Create date in GMT+6 timezone
+   const date = new Date(
+      now.getUTCFullYear(),
+      now.getUTCMonth(),
+      now.getUTCDate(),
       parseInt(hours),
       parseInt(minutes),
       parseInt(seconds)
-   ).getTime();
+   );
+   // Convert to UTC by subtracting 6 hours (GMT+6 to UTC)
+   date.setHours(date.getHours() - 6);
+   return date.getTime();
 };
