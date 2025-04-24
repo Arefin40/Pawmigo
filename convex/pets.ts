@@ -10,10 +10,14 @@ export const addPet = mutation({
    },
 
    handler: async (ctx, args) => {
+      const docs = await ctx.db.query("pets").collect();
+      const beep = docs.length + 1;
+
       const petId = await ctx.db.insert("pets", {
          name: args.name,
          rfid: args.rfid,
-         image: args.image ?? ""
+         image: args.image ?? "",
+         beep: beep
       });
       return petId;
    }

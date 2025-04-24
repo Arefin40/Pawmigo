@@ -15,7 +15,8 @@ export default defineSchema({
    pets: defineTable({
       name: v.string(),
       image: v.optional(v.string()),
-      rfid: v.string()
+      rfid: v.string(),
+      beep: v.number()
    }).index("by_rfid", ["rfid"]),
 
    // Schedule table

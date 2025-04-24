@@ -86,7 +86,8 @@ export const getTodaySchedules = query({
             petId: schedule.petId,
             portion: schedule.portion,
             timestamp: schedule.timestamp
-         }));
+         }))
+         .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 
       // Get pet RFID for each schedule
       const schedules = await Promise.all(
