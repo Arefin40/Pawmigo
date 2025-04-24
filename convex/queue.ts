@@ -88,7 +88,19 @@ export const get = query({
 export const complete = mutation({
    args: { id: v.id("queue") },
    handler: async (ctx, args) => {
+      // Get the queue item
+      const item = await ctx.db.get(args.id);
+      if (!item) throw new Error("Item not found");
+
+      // Update the item's completion status
       await ctx.db.patch(args.id, { isCompleted: true });
+
+      // Log the pet activity
+      await ctx.runMutation(api.activities.logPetActivity, {
+         rfid: item.rfid,
+         activityType: item.isManual ? "manual_feeding" : "schedule_feeding",
+         timestamp: item.timestamp
+      });
    }
 });
 

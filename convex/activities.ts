@@ -7,9 +7,7 @@ import { mutation, query } from "./_generated/server";
 export const getActivities = query({
    args: {},
    handler: async (ctx, args) => {
-      return (await ctx.db.query("activities").collect()).sort((a, b) =>
-         a.timestamp.localeCompare(b.timestamp)
-      );
+      return await ctx.db.query("activities").order("desc").collect();
    }
 });
 
@@ -22,7 +20,7 @@ export const getActivities = query({
 export const logPetActivity = mutation({
    args: {
       rfid: v.string(),
-      timestamp: v.string(),
+      timestamp: v.number(),
       activityType: v.union(
          v.literal("rfid_scan"),
          v.literal("schedule_feeding"),
@@ -66,7 +64,7 @@ export const logPetActivity = mutation({
  */
 export const logDeviceActivity = mutation({
    args: {
-      timestamp: v.string(),
+      timestamp: v.number(),
       activityType: v.union(
          v.literal("connection"),
          v.literal("low_food_level"),

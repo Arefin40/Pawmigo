@@ -66,6 +66,6 @@ export default defineSchema({
       ),
       petId: v.optional(v.id("pets")),
       description: v.string(),
-      timestamp: v.string()
+      timestamp: v.number()
    })
 });
