@@ -69,16 +69,41 @@ export const getEnabledSchedules = query({
 });
 
 // Get today's schedules
-export const getTodaySchedules = query(async ({ db }) => {
-   const today = daysOfWeek[new Date().getDay()];
+export const getTodaySchedules = query({
+   handler: async ({ db }) => {
+      const today = daysOfWeek[new Date().getDay()];
 
-   const schedules = await db
-      .query("schedule")
-      .withIndex("by_enabled", (q) => q.eq("enabled", true))
-      .collect();
+      // Get all enabled schedules
+      const enabledSchedules = await db
+         .query("schedule")
+         .withIndex("by_enabled", (q) => q.eq("enabled", true))
+         .collect();
 
-   const todaySchedules = schedules.filter((schedule) => schedule.days_of_week.includes(today));
-   return todaySchedules;
+      // Filter schedules for today and map to desired format
+      const todaySchedules = enabledSchedules
+         .filter((schedule) => schedule.days_of_week.includes(today))
+         .map((schedule) => ({
+            petId: schedule.petId,
+            portion: schedule.portion,
+            timestamp: schedule.timestamp
+         }));
+
+      // Get pet RFID for each schedule
+      const schedules = await Promise.all(
+         todaySchedules.map(async ({ petId, ...schedule }) => {
+            const pet = await db.get(petId);
+            if (!pet || !pet.rfid) {
+               throw new Error(`Pet with ID ${petId} not found or has no RFID`);
+            }
+            return {
+               rfid: pet.rfid,
+               ...schedule
+            };
+         })
+      );
+
+      return schedules;
+   }
 });
 
 // Update a schedule
