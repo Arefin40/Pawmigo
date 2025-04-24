@@ -88,3 +88,44 @@ export const logDeviceActivity = mutation({
       });
    }
 });
+
+// Logs a connection activity
+export const connection = mutation({
+   handler: async (ctx, args) => {
+      return await ctx.db.insert("activities", {
+         activityType: "connection",
+         description: "Device connected to the network.",
+         timestamp: Date.now()
+      });
+   }
+});
+
+// Logs a low food level activity
+export const lowFoodLevel = mutation({
+   handler: async (ctx, args) => {
+      return await ctx.db.insert("activities", {
+         activityType: "low_food_level",
+         description: "Please refill food.",
+         timestamp: Date.now()
+      });
+   }
+});
+
+// Logs skipped feeding activity
+export const skippedFeeding = mutation({
+   args: { rfid: v.string() },
+   handler: async (ctx, args) => {
+      // Find pet by RFID
+      const pet = await ctx.db
+         .query("pets")
+         .withIndex("by_rfid", (q) => q.eq("rfid", args.rfid))
+         .unique();
+
+      return await ctx.db.insert("activities", {
+         activityType: "skip_feeding",
+         description: `${pet?.name} skipped its scheduled feed.`,
+         timestamp: Date.now(),
+         petId: pet?._id
+      });
+   }
+});
