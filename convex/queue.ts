@@ -69,7 +69,7 @@ export const today = query({
 });
 
 // Get all incomplete items in the queue
-export const get = query({
+export const getIncompleteQueue = query({
    handler: async (ctx) => {
       const queue = await ctx.db
          .query("queue")
@@ -81,6 +81,22 @@ export const get = query({
          .map(({ _creationTime, ...rest }) => ({
             ...rest
          }));
+   }
+});
+
+// get first item in the queue
+export const getFirst = query({
+   handler: async (ctx) => {
+      const queue = await ctx.db
+         .query("queue")
+         .filter((q) => q.eq(q.field("isCompleted"), false))
+         .collect();
+
+      if (queue.length === 0) return null;
+
+      const firstItem = queue.sort((a, b) => a.timestamp - b.timestamp)[0];
+      const { _creationTime, ...rest } = firstItem;
+      return rest;
    }
 });
 
