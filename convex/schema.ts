@@ -19,6 +19,18 @@ export default defineSchema({
       beep: v.number()
    }).index("by_rfid", ["rfid"]),
 
+   // Feeding Queue table
+   queue: defineTable({
+      rfid: v.string(),
+      portion: v.number(),
+      timestamp: v.number(),
+      isManual: v.boolean(),
+      isCompleted: v.boolean(),
+      beep: v.number()
+   })
+      .index("by_completed", ["isCompleted"])
+      .index("by_timestamp", ["timestamp"]),
+
    // Schedule table
    schedule: defineTable({
       petId: v.id("pets"),
