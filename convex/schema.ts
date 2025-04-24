@@ -45,9 +45,11 @@ export default defineSchema({
       activityType: v.union(
          v.literal("schedule_feeding"),
          v.literal("manual_feeding"),
+         v.literal("skip_feeding"),
          v.literal("error"),
          v.literal("connection"),
-         v.literal("rfid_scan")
+         v.literal("rfid_scan"),
+         v.literal("low_food_level")
       ),
       petId: v.optional(v.id("pets")),
       description: v.string(),
