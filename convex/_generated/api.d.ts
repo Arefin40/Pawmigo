@@ -16,6 +16,7 @@ import type {
 import type * as activities from "../activities.js";
 import type * as crons from "../crons.js";
 import type * as devices from "../devices.js";
+import type * as functions from "../functions.js";
 import type * as pets from "../pets.js";
 import type * as queue from "../queue.js";
 import type * as schedules from "../schedules.js";
@@ -32,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   activities: typeof activities;
   crons: typeof crons;
   devices: typeof devices;
+  functions: typeof functions;
   pets: typeof pets;
   queue: typeof queue;
   schedules: typeof schedules;
