@@ -29,7 +29,7 @@ export default function SchedulesScreen() {
                      onPress={() => router.push(`/schedules/details/${schedule._id}`)}
                      className="bg-white/10 backdrop-blur-md p-4 rounded-3xl overflow-hidden mb-4 gap-y-1"
                   >
-                     <Text className="font-em text-white/60">Meal-{index + 1}</Text>
+                     <Text className="font-em text-white/60">{schedule.name || "Meal"}</Text>
 
                      <View className="flex-row items-center justify-between">
                         <Text className="font-em text-3xl">
