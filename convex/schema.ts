@@ -6,9 +6,21 @@ export default defineSchema({
    devices: defineTable({
       deviceId: v.string(),
       secret: v.string(),
-      status: v.union(v.literal("online"), v.literal("offline")),
-      registrationDate: v.optional(v.string()),
-      foodLevel: v.optional(v.number())
+      registrationDate: v.optional(v.string())
+   }).index("by_device_id", ["deviceId"]),
+
+   // Tracking states
+   deviceState: defineTable({
+      deviceId: v.string(),
+      connectionStatus: v.union(v.literal("online"), v.literal("offline")),
+      foodLevel: v.number(),
+      lastFeed: v.optional(
+         v.object({
+            time: v.string(),
+            portion: v.number(),
+            petImage: v.optional(v.string())
+         })
+      )
    }).index("by_device_id", ["deviceId"]),
 
    // Pets table

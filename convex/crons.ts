@@ -7,7 +7,7 @@ crons.daily(
    "Schedule Daily Feedings",
    {
       hourUTC: 18,
-      minuteUTC: 0
+      minuteUTC: 5
    },
    api.queue.scheduleDailyFeedings,
    {}

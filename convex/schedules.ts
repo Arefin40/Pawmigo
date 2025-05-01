@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { convertToTimestamp } from "./queue";
 
 const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"] as const;
 
@@ -72,7 +73,12 @@ export const getEnabledSchedules = query({
 // Get today's schedules
 export const getTodaySchedules = query({
    handler: async ({ db }) => {
-      const today = daysOfWeek[new Date().getDay()];
+      // Get today's day of the week in GMT+6
+      const unixSeconds = convertToTimestamp("00:00:00");
+      const dateUTC = new Date(unixSeconds * 1000);
+      const gmt6OffsetMs = 6 * 60 * 60 * 1000;
+      const dateInGMT6 = new Date(dateUTC.getTime() + gmt6OffsetMs);
+      const today = daysOfWeek[dateInGMT6.getUTCDay()];
 
       // Get all enabled schedules
       const enabledSchedules = await db

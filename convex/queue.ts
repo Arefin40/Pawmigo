@@ -1,6 +1,7 @@
 import { mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
 
 // Add new item to the queue
 export const add = mutation({
@@ -117,6 +118,11 @@ export const complete = mutation({
          activityType: item.isManual ? "manual_feeding" : "schedule_feeding",
          timestamp: item.timestamp
       });
+
+      // Update last feed time
+      await ctx.runMutation(api.devices.updateLastFeed, {
+         portion: item.portion
+      });
    }
 });
 
@@ -130,20 +136,59 @@ export const clear = mutation({
    }
 });
 
-// Convert HH:MM:SS in GMT+6 to timestamp in milliseconds
-export const convertToTimestamp = (time: string) => {
-   const [hours, minutes, seconds] = time.split(":");
+// Get queue status grouped by rfid
+export const getQueueStatus = query({
+   handler: async (ctx) => {
+      const [queue, pets] = await Promise.all([
+         ctx.db.query("queue").collect(),
+         ctx.db.query("pets").collect()
+      ]);
+
+      const petImageMap = pets.reduce(
+         (acc, pet) => {
+            acc[pet.rfid] = pet.image || null;
+            return acc;
+         },
+         {} as Record<string, string | null>
+      );
+
+      const status = queue.reduce(
+         (acc, { rfid, _id, isManual, isCompleted }) => {
+            if (!acc[rfid]) {
+               acc[rfid] = { feeds: [], image: petImageMap[rfid] || "" };
+            }
+            acc[rfid].feeds.push({ id: _id, isManual, isCompleted });
+            return acc;
+         },
+         {} as Record<
+            string,
+            {
+               feeds: { id: Id<"queue">; isManual: boolean; isCompleted: boolean }[];
+               image: string;
+            }
+         >
+      );
+
+      // Convert to array format
+      return Object.entries(status).map(([rfid, { feeds, image }]) => ({
+         rfid,
+         image,
+         feeds
+      }));
+   }
+});
+
+// Convert HH:MM:SS in GMT+6 to timestamp in unix seconds
+export const convertToTimestamp = (time: string): number => {
+   const [hours, minutes] = time.split(":").map(Number);
    const now = new Date();
-   // Create date in GMT+6 timezone
-   const date = new Date(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      parseInt(hours),
-      parseInt(minutes),
-      parseInt(seconds)
-   );
-   // Convert to UTC by subtracting 6 hours (GMT+6 to UTC)
-   date.setHours(date.getHours() - 6);
-   return date.getTime();
+
+   const gmt6OffsetMs = 6 * 60 * 60 * 1000;
+   const nowInGMT6 = new Date(now.getTime() + gmt6OffsetMs);
+   const gmt6Year = nowInGMT6.getUTCFullYear();
+   const gmt6Month = nowInGMT6.getUTCMonth();
+   const gmt6Date = nowInGMT6.getUTCDate();
+
+   const utcDateForGmt6 = new Date(Date.UTC(gmt6Year, gmt6Month, gmt6Date, hours - 6, minutes, 0));
+   return Math.floor(utcDateForGmt6.getTime() / 1000);
 };
