@@ -6,6 +6,16 @@ import { Sora_700Bold } from "@expo-google-fonts/sora";
 import { Mulish_500Medium, Mulish_600SemiBold, Mulish_700Bold } from "@expo-google-fonts/mulish";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import { NotificationProvider } from "@/context/NotificationContext";
+import * as Notifications from "expo-notifications";
+
+Notifications.setNotificationHandler({
+   handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true
+   })
+});
 
 // Initialize Convex client
 const convex = new ConvexReactClient(process.env.EXPO_PUBLIC_CONVEX_URL!, {
@@ -31,8 +41,10 @@ export default function RootLayout() {
    if (!fontsLoaded) return null;
 
    return (
-      <ConvexProvider client={convex}>
-         <Slot />
-      </ConvexProvider>
+      <NotificationProvider>
+         <ConvexProvider client={convex}>
+            <Slot />
+         </ConvexProvider>
+      </NotificationProvider>
    );
 }

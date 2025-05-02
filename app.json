@@ -28,7 +28,8 @@
             "android.permission.INTERNET",
             "android.permission.ACCESS_NETWORK_STATE"
          ],
-         "package": "com.shahriararefin.pawmigo"
+         "package": "com.shahriararefin.pawmigo",
+         "googleServicesFile": "./google-services.json"
       },
       "web": {
          "bundler": "metro",
