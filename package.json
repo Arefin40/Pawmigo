@@ -11,7 +11,7 @@
       "web": "expo start -c --web",
       "clean": "rm -rf .expo node_modules",
       "prebuild": "bunx expo prebuild --clean --platform android",
-      "eas:build": "eas build --platform android --profile development",
+      "eas:build": "eas build --platform android --profile development --clear-cache",
       "export": "bunx expo export --platform android",
       "postinstall": "npx tailwindcss -i ./global.css -o ./node_modules/.cache/nativewind/global.css",
       "format": "prettier --write ."
@@ -40,7 +40,7 @@
       "expo-dev-client": "~5.0.20",
       "expo-device": "~7.0.3",
       "expo-image-picker": "~16.0.6",
-      "expo-linear-gradient": "14.1.4~14.0.2",
+      "expo-linear-gradient": "~14.0.2",
       "expo-linking": "~7.0.4",
       "expo-navigation-bar": "~4.0.7",
       "expo-notifications": "~0.29.14",
@@ -73,6 +73,28 @@
       "@types/react-native-onboarding-swiper": "^1.1.9",
       "prettier": "^3.5.3",
       "typescript": "^5.3.3"
+   },
+   "expo": {
+      "doctor": {
+         "reactNativeDirectoryCheck": {
+            "exclude": [
+               "react-native-nfc-manager",
+               "@rn-primitives/avatar",
+               "@rn-primitives/dialog",
+               "@rn-primitives/label",
+               "@rn-primitives/portal",
+               "@rn-primitives/progress",
+               "@rn-primitives/slot",
+               "@rn-primitives/switch",
+               "@rn-primitives/tooltip",
+               "@rn-primitives/types",
+               "class-variance-authority",
+               "convex",
+               "convex-helpers",
+               "tailwindcss-animate"
+            ]
+         }
+      }
    },
    "private": true
 }
