@@ -25,11 +25,10 @@
          "permissions": [
             "android.permission.RECORD_AUDIO",
             "android.permission.NFC",
-            "android.permission.RECORD_AUDIO",
-            "android.permission.NFC",
             "android.permission.INTERNET",
             "android.permission.ACCESS_NETWORK_STATE"
-         ]
+         ],
+         "package": "com.shahriararefin.pawmigo"
       },
       "web": {
          "bundler": "metro",
@@ -56,6 +55,14 @@
       ],
       "experiments": {
          "typedRoutes": true
+      },
+      "extra": {
+         "router": {
+            "origin": false
+         },
+         "eas": {
+            "projectId": "f0aa8a87-8bbb-42c3-a37d-bfda6b350ab8"
+         }
       }
    }
 }
