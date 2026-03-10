@@ -1,11 +1,11 @@
 import React from "react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Text } from "@/components/ui/text";
 import { api } from "@/convex/_generated/api";
-import { iconWithClassName } from "@/lib/utils";
+import { formatTime, iconWithClassName } from "@/lib/utils";
 import { View, ScrollView, TouchableOpacity } from "react-native";
 import type { Activity, ActivityItemProps, FilterButtonProps } from "@/types/activities";
-import { Clock, Zap, Wifi, AlertTriangle, Rss, Cat } from "lucide-react-native";
+import { Clock, Zap, Wifi, AlertTriangle, Rss, Cat, Trash2 } from "lucide-react-native";
 import LoadingState from "@/components/LoadingState";
 
 iconWithClassName(Clock);
@@ -14,6 +14,7 @@ iconWithClassName(Wifi);
 iconWithClassName(AlertTriangle);
 iconWithClassName(Rss);
 iconWithClassName(Cat);
+iconWithClassName(Trash2);
 
 const filters = [
    { label: "All", value: "all" },
@@ -23,6 +24,7 @@ const filters = [
 
 export default function ActivitiesScreen() {
    const [filter, setFilter] = React.useState<"all" | "pet" | "device">("all");
+   const deleteAllActivities = useMutation(api.activities.clear);
    const activities = useQuery(api.activities.getActivities);
    if (activities === undefined) return <LoadingState />;
 
@@ -57,6 +59,12 @@ export default function ActivitiesScreen() {
                   onPress={() => setFilter(value as typeof filter)}
                />
             ))}
+            <TouchableOpacity
+               onPress={async () => await deleteAllActivities()}
+               className="px-4 py-2 flex items-center justify-center rounded-full bg-white/20"
+            >
+               <Trash2 strokeWidth={1.75} size={18} className="text-white/80" />
+            </TouchableOpacity>
          </View>
 
          <ScrollView className="flex-1">
@@ -87,7 +95,7 @@ const ActivityItem: React.FC<ActivityItemProps> = ({ activity, icon }) => (
       <View className="flex-1 gap-y-1">
          <Text className="text-white font-sans">{activity.description}</Text>
          <Text className="text-muted-foreground text-sm font-sans">
-            {new Date(activity.timestamp).toLocaleString()}
+            {formatTime(activity.timestamp)}
          </Text>
       </View>
    </View>

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getFormattedCurrentTimeInGMT6 } from "./utils/time";
 
 // Add a device to the database
 export const addDevice = mutation({
@@ -134,7 +135,7 @@ export const updateLastFeed = mutation({
       if (device) {
          await ctx.db.patch(device._id, {
             lastFeed: {
-               time: getCurrentTimeInGMT6(),
+               time: getFormattedCurrentTimeInGMT6(),
                portion: args.portion,
                petImage: args.image
             }
@@ -143,16 +144,17 @@ export const updateLastFeed = mutation({
    }
 });
 
-function getCurrentTimeInGMT6() {
-   const now = new Date();
+// Set expo push token
+export const setExpoPushToken = mutation({
+   args: { id: v.optional(v.string()), token: v.string() },
+   handler: async (ctx, args) => {
+      const device = await ctx.db
+         .query("deviceState")
+         .withIndex("by_device_id", (q) => q.eq("deviceId", args.id || "22101040"))
+         .unique();
 
-   const options = {
-      timeZone: "Asia/Dhaka",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-   } as Intl.DateTimeFormatOptions;
-
-   const formatter = new Intl.DateTimeFormat("en-US", options);
-   return formatter.format(now);
-}
+      if (device) {
+         await ctx.db.patch(device._id, { pushToken: args.token });
+      }
+   }
+});

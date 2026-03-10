@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
 import * as Notifications from "expo-notifications";
 import { registerForPushNotificationsAsync } from "@/lib/registerForPushNotificationsAsync";
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
 
 interface NotificationContextType {
    expoPushToken: string | null;
@@ -23,6 +25,7 @@ interface NotificationProviderProps {
 }
 
 export const NotificationProvider: React.FC<NotificationProviderProps> = ({ children }) => {
+   const storeExpoPushToken = useMutation(api.devices.setExpoPushToken);
    const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
    const [notification, setNotification] = useState<Notifications.Notification | null>(null);
    const [error, setError] = useState<Error | null>(null);
@@ -32,24 +35,22 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
 
    useEffect(() => {
       registerForPushNotificationsAsync().then(
-         (token) => setExpoPushToken(token),
+         (token) => {
+            setExpoPushToken(token);
+            storeExpoPushToken({ token });
+         },
          (error) => setError(error)
       );
 
       notificationListener.current = Notifications.addNotificationReceivedListener(
          (notification) => {
-            console.log("🔔 Notification Received: ", notification);
+            console.log("🔔 Notification Received");
             setNotification(notification);
          }
       );
 
       responseListener.current = Notifications.addNotificationResponseReceivedListener(
          (response) => {
-            console.log(
-               "🔔 Notification Response: ",
-               JSON.stringify(response, null, 2),
-               JSON.stringify(response.notification.request.content.data, null, 2)
-            );
             // Handle the notification response here
          }
       );

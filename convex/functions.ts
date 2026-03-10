@@ -11,7 +11,7 @@ const triggers = new Triggers<DataModel>();
 
 // Register a trigger to run when a `schedule` changes
 triggers.register("schedule", async (ctx, change) => {
-   await ctx.runMutation(api.queue.scheduleDailyFeedings);
+   await ctx.runMutation(api.queue.syncQueueWithSchedule);
 });
 
 export const mutation = customMutation(rawMutation, customCtx(triggers.wrapDB));

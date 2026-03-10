@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { action, mutation, query } from "./_generated/server";
+import { getCurrentTimeInGMT6 } from "./utils/time";
+import { api } from "./_generated/api";
 
 /**
  * Get all activities from the database
@@ -89,6 +91,45 @@ export const logDeviceActivity = mutation({
    }
 });
 
+// Logs wrong RFID detected and sends push notification
+export const WrongRFIDDetected = action({
+   args: { rfid: v.string(), timestamp: v.number() },
+   handler: async (ctx, args): Promise<void> => {
+      // Find pet by RFID and device state in parallel
+      const pet = await ctx.runQuery(api.pets.getPetDetails, { rfid: args.rfid });
+
+      // Log wrong RFID detected
+      await ctx.runMutation(api.activities.logPetActivity, {
+         rfid: args.rfid,
+         activityType: "rfid_scan",
+         timestamp: args.timestamp || getCurrentTimeInGMT6()
+      });
+
+      // Send push notification
+      const device = await ctx.runQuery(api.devices.getDeviceState, { id: "22101040" });
+      if (device?.pushToken) {
+         const response = await fetch("https://exp.host/--/api/v2/push/send", {
+            method: "POST",
+            headers: {
+               host: "exp.host",
+               accept: "application/json",
+               "accept-encoding": "gzip, deflate",
+               "content-type": "application/json"
+            },
+            body: JSON.stringify({
+               to: device.pushToken,
+               sound: "default",
+               title: "Pawmigo",
+               body: pet?.name
+                  ? `${pet?.name} is roaming around`
+                  : `Unknown pet detected with RFID: ${args.rfid}`
+            })
+         });
+         return response.json();
+      }
+   }
+});
+
 // Logs a connection activity
 export const connection = mutation({
    handler: async (ctx, args) => {
@@ -127,5 +168,40 @@ export const skippedFeeding = mutation({
          timestamp: Date.now(),
          petId: pet?._id
       });
+   }
+});
+
+// Get actionable rfid scan activities with pet details
+export const getActionableRFIDScanActivities = query({
+   args: {},
+   handler: async (ctx) => {
+      const fiveMinutesAgo = getCurrentTimeInGMT6() - 5 * 60 * 1000;
+
+      return await ctx.db
+         .query("activities")
+         .withIndex("by_activityType", (q) => q.eq("activityType", "rfid_scan"))
+         .filter((q) =>
+            q.and(q.gt(q.field("timestamp"), fiveMinutesAgo), q.neq(q.field("isRead"), true))
+         )
+         .order("desc")
+         .collect();
+   }
+});
+
+// Mark the activity log as read
+export const markTheActivityLogAsRead = mutation({
+   args: { id: v.id("activities") },
+   handler: async (ctx, args) => {
+      await ctx.db.patch(args.id, { isRead: true });
+   }
+});
+
+// Delete all activities logs
+export const clear = mutation({
+   handler: async (ctx) => {
+      const activities = await ctx.db.query("activities").collect();
+      if (activities.length > 0) {
+         await Promise.all(activities.map((activity) => ctx.db.delete(activity._id)));
+      }
    }
 });

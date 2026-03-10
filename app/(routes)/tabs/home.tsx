@@ -1,4 +1,4 @@
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Image, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
@@ -13,6 +13,8 @@ iconWithClassName(Cat);
 
 export default function HomeScreen() {
    const feeder = useQuery(api.devices.getDeviceState, { id: "22101040" });
+   const scheduleAManualFeeding = useMutation(api.queue.scheduleManualFeeding);
+   const rfidActivities = useQuery(api.activities.getActionableRFIDScanActivities);
    const queueStatus = useQuery(api.queue.getQueueStatus);
    const isOnline = feeder?.connectionStatus === "online";
 
@@ -37,12 +39,6 @@ export default function HomeScreen() {
                   />
                </View>
             </BlurView>
-
-            {/* Next Feeding */}
-            {/* <BlurView intensity={30} className="rounded-3xl p-6 overflow-hidden">
-               <Text className="text-white/60 font-sans mb-2">Next Feeding</Text>
-               <Text className="text-3xl text-white font-strong">{nextFeed}</Text>
-            </BlurView> */}
 
             {/* Last Fed */}
             <BlurView intensity={30} className="rounded-3xl p-6 overflow-hidden">
@@ -102,23 +98,49 @@ export default function HomeScreen() {
             </View>
 
             {/* Pet at Feeder Alert */}
-            <BlurView
-               intensity={30}
-               className="p-4 rounded-3xl flex-row items-center gap-4 overflow-hidden"
-            >
-               <View className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
-                  <Cat size={24} className="text-sky-500" />
-               </View>
+            {rfidActivities && rfidActivities.length > 0 ? (
+               rfidActivities.map((activity) => (
+                  <BlurView
+                     key={activity._id}
+                     intensity={30}
+                     className="p-4 rounded-3xl flex-row items-center gap-4 overflow-hidden"
+                  >
+                     <View className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                        <Cat size={24} className="text-sky-500" />
+                     </View>
 
-               <View className="flex-1 gap-y-1">
-                  <Text className="font-sans text-white">Luna is at the feeder</Text>
-                  <Text className="font-sans text-muted-foreground">Waiting for approval</Text>
-               </View>
+                     <View className="flex-1 gap-y-1">
+                        <Text className="font-sans text-white">{activity.description}</Text>
+                        <Text className="font-sans text-muted-foreground">
+                           Waiting for approval
+                        </Text>
+                     </View>
 
-               <Button className="px-4 py-2 rounded-full">
-                  <Text className="text-white font-em">View</Text>
-               </Button>
-            </BlurView>
+                     <Button
+                        onPress={async () => {
+                           if (activity.petId) {
+                              await scheduleAManualFeeding({
+                                 id: activity._id,
+                                 petId: activity.petId
+                              });
+                           }
+                        }}
+                        className="px-4 py-2 rounded-full"
+                     >
+                        <Text className="text-white font-em">Feed</Text>
+                     </Button>
+                  </BlurView>
+               ))
+            ) : (
+               <BlurView
+                  intensity={15}
+                  className="p-4 rounded-2xl flex-row items-center gap-4 overflow-hidden"
+               >
+                  <Text className="font-sans text-white/60 text-center flex-1">
+                     No manual feeding request
+                  </Text>
+               </BlurView>
+            )}
          </View>
       </ScrollView>
    );

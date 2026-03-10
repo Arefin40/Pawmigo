@@ -41,10 +41,10 @@ export default function RootLayout() {
    if (!fontsLoaded) return null;
 
    return (
-      <NotificationProvider>
-         <ConvexProvider client={convex}>
+      <ConvexProvider client={convex}>
+         <NotificationProvider>
             <Slot />
-         </ConvexProvider>
-      </NotificationProvider>
+         </NotificationProvider>
+      </ConvexProvider>
    );
 }

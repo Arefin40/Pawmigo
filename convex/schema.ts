@@ -12,6 +12,7 @@ export default defineSchema({
    // Tracking states
    deviceState: defineTable({
       deviceId: v.string(),
+      pushToken: v.optional(v.string()),
       connectionStatus: v.union(v.literal("online"), v.literal("offline")),
       foodLevel: v.number(),
       lastFeed: v.optional(
@@ -38,7 +39,8 @@ export default defineSchema({
       timestamp: v.number(),
       isManual: v.boolean(),
       isCompleted: v.boolean(),
-      beep: v.number()
+      beep: v.number(),
+      scheduleId: v.optional(v.string())
    })
       .index("by_completed", ["isCompleted"])
       .index("by_timestamp", ["timestamp"]),
@@ -78,6 +80,7 @@ export default defineSchema({
       ),
       petId: v.optional(v.id("pets")),
       description: v.string(),
-      timestamp: v.number()
-   })
+      timestamp: v.number(),
+      isRead: v.optional(v.boolean())
+   }).index("by_activityType", ["activityType"])
 });

@@ -2,6 +2,7 @@ import { mutation, query } from "./_generated/server";
 import { api } from "./_generated/api";
 import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
+import { convertHHMMSSToTimestamp, getCurrentTimeInGMT6 } from "./utils/time";
 
 // Add new item to the queue
 export const add = mutation({
@@ -9,7 +10,8 @@ export const add = mutation({
       rfid: v.string(),
       portion: v.number(),
       timestamp: v.optional(v.number()),
-      isManual: v.boolean()
+      isManual: v.boolean(),
+      scheduleId: v.optional(v.string())
    },
    handler: async (ctx, args) => {
       const pet = await ctx.db
@@ -22,10 +24,11 @@ export const add = mutation({
       await ctx.db.insert("queue", {
          rfid: args.rfid,
          portion: args.portion,
-         timestamp: args.timestamp || new Date().getTime(),
+         timestamp: args.timestamp || getCurrentTimeInGMT6(),
          isManual: args.isManual,
          isCompleted: false,
-         beep: pet.beep
+         beep: pet.beep,
+         scheduleId: args.scheduleId
       });
    }
 });
@@ -42,9 +45,33 @@ export const scheduleDailyFeedings = mutation({
          await ctx.runMutation(api.queue.add, {
             rfid: schedule.rfid,
             portion: schedule.portion,
-            timestamp: convertToTimestamp(schedule.timestamp),
-            isManual: false
+            timestamp: convertHHMMSSToTimestamp(schedule.timestamp),
+            isManual: false,
+            scheduleId: schedule.id
          });
+      }
+   }
+});
+
+export const syncQueueWithSchedule = mutation({
+   handler: async (ctx) => {
+      // Clear the incomplete queues
+      await ctx.runMutation(api.queue.clearIncompleteQueues);
+
+      // Get today's schedules and add them to the queue
+      const todaySchedules = await ctx.runQuery(api.schedules.getTodaySchedules);
+      const completedScheduleIds = await ctx.runQuery(api.queue.getCompletedQueueIds);
+
+      for (const schedule of todaySchedules) {
+         if (!completedScheduleIds.includes(schedule.id)) {
+            await ctx.runMutation(api.queue.add, {
+               rfid: schedule.rfid,
+               portion: schedule.portion,
+               timestamp: convertHHMMSSToTimestamp(schedule.timestamp),
+               isManual: false,
+               scheduleId: schedule.id
+            });
+         }
       }
    }
 });
@@ -85,6 +112,21 @@ export const getIncompleteQueue = query({
    }
 });
 
+// Get all completed queue's schedule ids
+export const getCompletedQueueIds = query({
+   handler: async (ctx) => {
+      const completedQueues = await ctx.db
+         .query("queue")
+         .filter((q) => q.eq(q.field("isCompleted"), true))
+         .collect();
+
+      return completedQueues.reduce<string[]>((acc, current) => {
+         if (current.scheduleId) acc.push(current.scheduleId);
+         return acc;
+      }, []);
+   }
+});
+
 // get first item in the queue
 export const getFirst = query({
    handler: async (ctx) => {
@@ -103,7 +145,7 @@ export const getFirst = query({
 
 // Mark an item as completed
 export const complete = mutation({
-   args: { id: v.id("queue") },
+   args: { id: v.id("queue"), timestamp: v.optional(v.number()) },
    handler: async (ctx, args) => {
       // Get the queue item
       const item = await ctx.db.get(args.id);
@@ -116,7 +158,7 @@ export const complete = mutation({
       await ctx.runMutation(api.activities.logPetActivity, {
          rfid: item.rfid,
          activityType: item.isManual ? "manual_feeding" : "schedule_feeding",
-         timestamp: item.timestamp
+         timestamp: args.timestamp || getCurrentTimeInGMT6()
       });
 
       // Update last feed time
@@ -132,6 +174,20 @@ export const clear = mutation({
       const docs = await ctx.db.query("queue").collect();
       if (docs.length > 0) {
          await Promise.all(docs.map((doc) => ctx.db.delete(doc._id)));
+      }
+   }
+});
+
+// Clear incomplete queues
+export const clearIncompleteQueues = mutation({
+   handler: async (ctx) => {
+      const incompleteQueues = await ctx.db
+         .query("queue")
+         .filter((q) => q.eq(q.field("isCompleted"), false))
+         .collect();
+
+      if (incompleteQueues.length > 0) {
+         await Promise.all(incompleteQueues.map((queue) => ctx.db.delete(queue._id)));
       }
    }
 });
@@ -178,17 +234,21 @@ export const getQueueStatus = query({
    }
 });
 
-// Convert HH:MM:SS in GMT+6 to timestamp in unix seconds
-export const convertToTimestamp = (time: string): number => {
-   const [hours, minutes] = time.split(":").map(Number);
-   const now = new Date();
+// Schedule a manual feeding
+export const scheduleManualFeeding = mutation({
+   args: { id: v.id("activities"), petId: v.id("pets") },
+   handler: async (ctx, args) => {
+      // Mark the activity log as read
+      await ctx.runMutation(api.activities.markTheActivityLogAsRead, { id: args.id });
 
-   const gmt6OffsetMs = 6 * 60 * 60 * 1000;
-   const nowInGMT6 = new Date(now.getTime() + gmt6OffsetMs);
-   const gmt6Year = nowInGMT6.getUTCFullYear();
-   const gmt6Month = nowInGMT6.getUTCMonth();
-   const gmt6Date = nowInGMT6.getUTCDate();
-
-   const utcDateForGmt6 = new Date(Date.UTC(gmt6Year, gmt6Month, gmt6Date, hours - 6, minutes, 0));
-   return Math.floor(utcDateForGmt6.getTime() / 1000);
-};
+      // Add a manual feeding in queue
+      const pet = await ctx.db.get(args.petId);
+      if (!pet) throw new Error("Pet not found");
+      await ctx.runMutation(api.queue.add, {
+         rfid: pet.rfid,
+         portion: 1,
+         timestamp: getCurrentTimeInGMT6(),
+         isManual: true
+      });
+   }
+});

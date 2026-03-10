@@ -85,9 +85,9 @@ const ScanRFIDModal: React.FC<ScanRFIDModalProps> = ({ open = false, onOpenChang
    }, [open, isScanning, readNFC]);
 
    return (
-      <View className="flex-1 items-center justify-center">
+      <View className="p-6 flex-1 items-center justify-center">
          <Dialog open={open} onOpenChange={onOpenChange} className="w-full">
-            <DialogContent className="w-full rounded-3xl py-6">
+            <DialogContent className="w-full max-w-sm rounded-3xl py-6">
                <RFID />
                <DialogHeader className="gap-y-3 my-0xw">
                   <DialogTitle className="text-center native:text-2xl">

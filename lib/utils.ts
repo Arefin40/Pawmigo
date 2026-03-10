@@ -61,3 +61,27 @@ export const formatTo24Hour = (timestamp: string) => {
 
    return `${hourStr}:${minuteStr}:00`;
 };
+
+// Formatted time
+export const formatTime = (timestamp: number) => {
+   // Convert Unix seconds to milliseconds
+   const utcMillis = timestamp * 1000;
+   // GMT+6 offset in milliseconds
+   const gmt6OffsetMs = 6 * 60 * 60 * 1000;
+   // Create date in GMT+6
+   const date = new Date(utcMillis + gmt6OffsetMs);
+
+   const day = date.getUTCDate();
+   const month = date.toLocaleString("default", { month: "long" });
+   const year = date.getUTCFullYear();
+   let hours = date.getUTCHours();
+   const minutes = date.getUTCMinutes();
+   const period = hours >= 12 ? "PM" : "AM";
+
+   hours = hours % 12 || 12;
+
+   const formattedDate = `${day} ${month} ${year}`;
+   const formattedTime = `${hours}:${String(minutes).padStart(2, "0")} ${period}`;
+
+   return `${formattedDate}  |  ${formattedTime}`;
+};

@@ -26,6 +26,7 @@ function ScheduleForm({ petId, schedule }: ScheduleFormProps) {
 
    const [time, setTime] = React.useState({ hour: "8", minute: "00", period: "AM" });
    const [feedData, setFeedData] = React.useState<ScheduleData>(DEFAULT_SCHEDULE);
+   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
    React.useEffect(() => {
       if (schedule) {
@@ -90,18 +91,25 @@ function ScheduleForm({ petId, schedule }: ScheduleFormProps) {
 
    const onSave = React.useCallback(async () => {
       if (!validateForm()) return;
+      setIsSubmitting(true);
 
-      if (schedule) {
-         await updateSchedule({
-            id: schedule._id,
-            ...feedData
-         });
-      } else {
-         // Create schedule logic here
-         await createSchedule({
-            petId: petId as Id<"pets">,
-            ...feedData
-         });
+      try {
+         if (schedule) {
+            await updateSchedule({
+               id: schedule._id,
+               ...feedData
+            });
+         } else {
+            // Create schedule logic here
+            await createSchedule({
+               petId: petId as Id<"pets">,
+               ...feedData
+            });
+         }
+      } catch (error) {
+         console.error(error);
+      } finally {
+         setIsSubmitting(false);
       }
 
       router.back();
@@ -208,7 +216,11 @@ function ScheduleForm({ petId, schedule }: ScheduleFormProps) {
 
          <View className="flex gap-y-4 items-center">
             {/* Save */}
-            <Button className="w-4/5 rounded-full py-5 text-white native:h-16" onPress={onSave}>
+            <Button
+               disabled={isSubmitting}
+               className="w-4/5 rounded-full py-5 text-white native:h-16"
+               onPress={onSave}
+            >
                <Text className="text-white font-sans !text-xl">Save</Text>
             </Button>
 
@@ -218,6 +230,7 @@ function ScheduleForm({ petId, schedule }: ScheduleFormProps) {
                   variant="outline"
                   className="w-4/5 rounded-full py-5 border-rose-950 bg-rose-500/30 native:h-16"
                   onPress={onDelete}
+                  disabled={isSubmitting}
                >
                   <Text className="text-rose-500 font-sans !text-xl">Delete</Text>
                </Button>

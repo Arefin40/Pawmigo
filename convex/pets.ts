@@ -29,3 +29,14 @@ export const getPets = query({
       return await ctx.db.query("pets").collect();
    }
 });
+
+// Get pet details by RFID
+export const getPetDetails = query({
+   args: { rfid: v.string() },
+   handler: async (ctx, args) => {
+      return await ctx.db
+         .query("pets")
+         .withIndex("by_rfid", (q) => q.eq("rfid", args.rfid))
+         .unique();
+   }
+});

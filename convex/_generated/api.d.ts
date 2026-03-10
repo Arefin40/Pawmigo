@@ -20,6 +20,7 @@ import type * as functions from "../functions.js";
 import type * as pets from "../pets.js";
 import type * as queue from "../queue.js";
 import type * as schedules from "../schedules.js";
+import type * as utils_time from "../utils/time.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -37,6 +38,7 @@ declare const fullApi: ApiFromModules<{
   pets: typeof pets;
   queue: typeof queue;
   schedules: typeof schedules;
+  "utils/time": typeof utils_time;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,
