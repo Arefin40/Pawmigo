@@ -70,7 +70,6 @@
       "@babel/core": "^7.26.0",
       "@react-native-community/cli": "^18.0.0",
       "@types/react": "~18.3.12",
-      "@types/react-native-onboarding-swiper": "^1.1.9",
       "prettier": "^3.5.3",
       "typescript": "^5.3.3"
    },
